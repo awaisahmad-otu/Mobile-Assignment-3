@@ -7,6 +7,11 @@ class OrderHistoryScreen extends StatelessWidget {
   // receive the date for the order history that needs to be displayed
   OrderHistoryScreen({required this.date});
 
+  // function to remove an order from the database
+  Future<void> _removeOrder(int orderId) async {
+    await DatabaseHelper.instance.removeOrder(orderId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +40,39 @@ class OrderHistoryScreen extends StatelessWidget {
               return ListTile(
                 title: Text(order['food_item']),
                 subtitle: Text("\$${order['cost']}"),
+                trailing: IconButton(
+                  // remove item from order history
+                  icon: Icon(Icons.remove),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Remove Item"),
+                          content: Text("Are you sure you want to remove ${order['food_item']} from the cart?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                await _removeOrder(order['id']);  // Remove the order
+                                Navigator.of(context).pop();  // Close the dialog
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("${order['food_item']} removed from the cart")),
+                                );
+                              },
+                              child: Text("Remove"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
               );
             },
           );

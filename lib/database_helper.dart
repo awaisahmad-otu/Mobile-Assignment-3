@@ -42,7 +42,6 @@ class DatabaseHelper {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
-    // Debugging: Print the inserted data
     print("Inserted order: Date: $date, Food: $foodItem, Cost: $cost");
   }
 
@@ -54,5 +53,16 @@ class DatabaseHelper {
       where: 'date = ?',
       whereArgs: [date],
     );
+  }
+
+  // remove an order by its id
+  Future<void> removeOrder(int orderId) async {
+    final db = await database;
+    await db.delete(
+      'orders',
+      where: 'id = ?',
+      whereArgs: [orderId],
+    );
+    print("Removed order with ID: $orderId");
   }
 }
